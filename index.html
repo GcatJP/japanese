@@ -1,26 +1,168 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="日本語">
-<title>日本語</title><link rel="stylesheet" href="style.css"></head><body><main id="m"></main>
-<script type="module">
-import{S,$,start,quiz,w,unhide,save}from"./app.js";
-import{D}from"./data.js";import{G}from"./grammar.js";
-const m=$("m"),all=()=>D.concat(S.mine),back='<a class="btn alt" href="#">Home</a>';
-function vocab(){
- m.innerHTML=back+`<h1>Vocabulary</h1><div class="card"><input id="a" placeholder="日本語"><input id="b" placeholder="ふりがな"><input id="c" placeholder="English"><button id="add">Add word</button></div><div class="card">${all().length} words, ${S.hidden.length} hidden</div>`+(S.hidden.length?`<div class="card">Hidden words (tap to bring back)${S.hidden.map(x=>`<button class="alt" data-u="${x}">${x}</button>`).join("")}</div>`:"");
- $("add").onclick=async()=>{const v=[$("a").value.trim(),$("b").value.trim(),$("c").value.trim()];if(v.includes(""))return;S.mine.push(v);await save("mine",S.mine);vocab()};
- m.querySelectorAll("[data-u]").forEach(b=>b.onclick=async()=>{await unhide(b.dataset.u);vocab()});
-}
-function qz(){
- const p=all(),items=p.map(([j,r,e])=>({id:j,q:w(j,r,j),a:e,c:[e,...p.filter(x=>x[2]!==e).sort(()=>Math.random()-.5).slice(0,3).map(x=>x[2])]}));
- m.innerHTML=back+'<h1>Quiz</h1><div class="card">Tap a word to see its reading. Double-tap a word you know to remove it for good.</div><div id="q"></div>';
- quiz($("q"),items);
-}
-function view(){
- const h=location.hash;
- if(h==="#grammar")m.innerHTML=back+"<h1>Grammar</h1>"+G.map(g=>`<a class="btn alt" href="${g.f}">${g.t}</a>`).join("");
- else if(h==="#vocab")vocab();else if(h==="#quiz")qz();
- else m.innerHTML='<h1>日本語</h1><a class="btn" href="#grammar">Grammar</a><a class="btn" href="#vocab">Vocabulary</a><a class="btn" href="#quiz">Quiz</a>';
-}
-start(()=>{view();addEventListener("hashchange",view)});
-</script></body></html>
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="日本語" />
+    <title>日本語</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="m"></main>
+    <script type="module">
+      import { S, $, start, quiz, w, unhide, save } from "./app.js";
+      import { D } from "./data.js";
+      import { G } from "./grammar.js";
+      const m = $("m"),
+        all = () => D.concat(S.mine),
+        back = '<a class="btn alt" href="#">Home</a>';
+      const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      const fmt = (t) =>
+        esc(t)
+          .replace(/([\u4e00-\u9fff々]+)\[([^\]]+)\]/g, (_, k, r) => w(k, r))
+          .replace(/\n/g, "<br>");
+      const plain = (t) => t.replace(/\[[^\]]*\]/g, "");
+      function vocab() {
+        m.innerHTML =
+          back +
+          `<h1>Vocabulary</h1><div class="card"><input id="a" placeholder="日本語"><input id="b" placeholder="ふりがな"><input id="c" placeholder="English"><button id="add">Add word</button></div><div class="card">${all().length} words, ${S.hidden.length} hidden</div>` +
+          (S.hidden.length
+            ? `<div class="card">Hidden words (tap to bring back)${S.hidden.map((x) => `<button class="alt" data-u="${x}">${x}</button>`).join("")}</div>`
+            : "");
+        $("add").onclick = async () => {
+          const v = [
+            $("a").value.trim(),
+            $("b").value.trim(),
+            $("c").value.trim(),
+          ];
+          if (v.includes("")) return;
+          S.mine.push(v);
+          await save("mine", S.mine);
+          vocab();
+        };
+        m.querySelectorAll("[data-u]").forEach(
+          (b) =>
+            (b.onclick = async () => {
+              await unhide(b.dataset.u);
+              vocab();
+            }),
+        );
+      }
+      function qz() {
+        const p = all(),
+          items = p.map(([j, r, e]) => ({
+            id: j,
+            q: w(j, r, j),
+            a: e,
+            c: [
+              e,
+              ...p
+                .filter((x) => x[2] !== e)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3)
+                .map((x) => x[2]),
+            ],
+          }));
+        m.innerHTML =
+          back +
+          '<h1>Quiz</h1><div class="card">Tap a word to see its reading. Double-tap a word you know to remove it for good.</div><div id="q"></div>';
+        quiz($("q"), items);
+      }
+      function stories() {
+        m.innerHTML =
+          back +
+          "<h1>Stories</h1>" +
+          S.stories
+            .map(
+              (s, i) => `<a class="btn alt" href="#story/${i}">${esc(s.n)}</a>`,
+            )
+            .join("") +
+          '<a class="btn" href="#add">+ Add story</a>';
+      }
+      function story(i) {
+        const s = S.stories[i];
+        if (!s) {
+          location.hash = "#stories";
+          return;
+        }
+        let slow = 0;
+        m.innerHTML = `<a class="btn alt" href="#stories">Stories</a><h1>${esc(s.n)}</h1><button id="pl">Read aloud</button><button class="alt" id="sp">Speed: normal</button><div class="card" style="font-size:22px;line-height:2.2">${fmt(s.t)}</div><button class="alt" id="del">Delete story</button>`;
+        const reset = () => {
+          $("pl").textContent = "Read aloud";
+          $("pl").dataset.on = "";
+        };
+        $("sp").onclick = () => {
+          slow = !slow;
+          $("sp").textContent = "Speed: " + (slow ? "slow" : "normal");
+        };
+        $("pl").onclick = () => {
+          speechSynthesis.cancel();
+          if ($("pl").dataset.on) {
+            reset();
+            return;
+          }
+          const u = new SpeechSynthesisUtterance(plain(s.t));
+          u.lang = "ja-JP";
+          u.rate = slow ? 0.6 : 0.9;
+          u.onend = reset;
+          speechSynthesis.speak(u);
+          $("pl").dataset.on = 1;
+          $("pl").textContent = "Stop";
+        };
+        $("del").onclick = async () => {
+          if (confirm("Delete this story?")) {
+            S.stories.splice(i, 1);
+            await save("stories", S.stories);
+            location.hash = "#stories";
+          }
+        };
+      }
+      function add() {
+        m.innerHTML =
+          '<a class="btn alt" href="#stories">Cancel</a><h1>New story</h1><input id="sn" placeholder="Story name"><textarea id="st" placeholder="Paste the story here"></textarea><button class="alt" id="pb">Paste from clipboard</button><button id="sv">Save story</button>';
+        $("pb").onclick = async () => {
+          try {
+            $("st").value = await navigator.clipboard.readText();
+          } catch (e) {
+            alert("Clipboard blocked. Tap the box and paste instead.");
+          }
+        };
+        $("sv").onclick = async () => {
+          const n = $("sn").value.trim(),
+            t = $("st").value.trim();
+          if (!n || !t) return;
+          S.stories.push({ n, t });
+          await save("stories", S.stories);
+          location.hash = "#stories";
+        };
+      }
+      function view() {
+        speechSynthesis.cancel();
+        const h = location.hash;
+        if (h === "#grammar")
+          m.innerHTML =
+            back +
+            "<h1>Grammar</h1>" +
+            G.map((g) => `<a class="btn alt" href="${g.f}">${g.t}</a>`).join(
+              "",
+            );
+        else if (h === "#vocab") vocab();
+        else if (h === "#quiz") qz();
+        else if (h === "#stories") stories();
+        else if (h === "#add") add();
+        else if (h.startsWith("#story/")) story(+h.slice(7));
+        else
+          m.innerHTML =
+            '<h1>日本語</h1><a class="btn" href="#grammar">Grammar</a><a class="btn" href="#vocab">Vocabulary</a><a class="btn" href="#quiz">Quiz</a><a class="btn" href="#stories">Stories</a>';
+      }
+      start(() => {
+        view();
+        addEventListener("hashchange", view);
+      });
+    </script>
+  </body>
+</html>

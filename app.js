@@ -3,7 +3,7 @@ import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged}from"https:
 import{getFirestore,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyDjs1ewDTv-3H7C22DipsDWBj1bMTuP5jQ",authDomain:"japanese-18664.firebaseapp.com",projectId:"japanese-18664",storageBucket:"japanese-18664.firebasestorage.app",messagingSenderId:"208278160949",appId:"1:208278160949:web:154d500421ea2a1792137c"});
 const auth=getAuth(app),db=getFirestore(app);
-export const S={hidden:[],mine:[],onHide(){}};
+export const S={hidden:[],mine:[],stories:[],onHide(){}};
 export const $=id=>document.getElementById(id);
 export const w=(k,r,id)=>`<ruby class="w"${id?` data-id="${id}"`:""}>${k}<rt>${r}</rt></ruby>`;
 let ref;
@@ -21,7 +21,7 @@ export function start(ready){
   }
   ref=doc(db,"users",u.uid);
   const s=await getDoc(ref);
-  if(s.exists()){S.hidden=s.data().hidden||[];S.mine=s.data().mine||[]}
+if(s.exists()){S.hidden=s.data().hidden||[];S.mine=s.data().mine||[];S.stories=s.data().stories||[]}
   $("login")?.remove();ready();
  });
 }
