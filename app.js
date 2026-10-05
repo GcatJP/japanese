@@ -33,20 +33,29 @@ document.addEventListener("click",e=>{
  lastEl=r;last=t;r.classList.toggle("show");
 });
 export function quiz(el,items,seq){
- let i=0,score=0;
- const next=()=>{
-  const p=seq?items:items.filter(x=>!S.hidden.includes(x.id));
-  if(!p.length||(seq&&i>=p.length)){el.innerHTML=`<div class="card">${p.length?`Score ${score}/${i}`:"No words left. You know them all."}</div>`;return}
-  const it=seq?p[i]:p[Math.random()*p.length|0];
-  el.innerHTML=`<div class="card"><div class="top">Score ${score}/${i}</div><div class="jp">${it.q}</div></div>`+[...it.c].sort(()=>Math.random()-.5).map(c=>`<button class="alt">${c}</button>`).join("");
-  let done=0;
-  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{
-   if(done)return;done=1;i++;
-   if(b.textContent===it.a)score++;
-   el.querySelectorAll("button").forEach(x=>{if(x.textContent===it.a)x.classList.add("ok");else if(x===b)x.classList.add("no")});
-   el.insertAdjacentHTML("beforeend",'<button id="nx">Next</button>');
-   $("nx").onclick=next;
-  });
+ const run=()=>{
+  let q=seq?[...items]:items.filter(x=>!S.hidden.includes(x.id)).sort(()=>Math.random()-.5).slice(0,10),pos=0,score=0,wrong=[];
+  const next=()=>{
+   q=q.filter((x,j)=>j<pos||!S.hidden.includes(x.id));
+   if(pos>=q.length){
+    S.onHide=()=>{};
+    el.innerHTML=`<div class="card">${q.length?`Score ${score}/${q.length}`:"No words left. You know them all."}</div>`+(wrong.length?"<h1>Missed</h1>"+wrong.map(x=>`<div class="card"><div class="jp">${x.q}</div><div style="text-align:center"><b>${x.a}</b></div></div>`).join(""):(q.length?'<div class="card">No mistakes.</div>':""))+'<button id="again">Try again</button>';
+    $("again").onclick=run;return;
+   }
+   const it=q[pos];
+   el.innerHTML=`<div class="card"><div class="top">${pos+1} / ${q.length}</div><div class="jp">${it.q}</div></div>`+[...it.c].sort(()=>Math.random()-.5).map(c=>`<button class="alt">${c}</button>`).join("");
+   let done=0;
+   el.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    if(done)return;done=1;
+    const ok=b.textContent===it.a;
+    if(ok)score++;else wrong.push(it);
+    el.querySelectorAll("button").forEach(x=>{if(x.textContent===it.a)x.classList.add("ok");else if(x===b)x.classList.add("no")});
+    const go=()=>{pos++;next()};
+    if(ok)setTimeout(go,600);
+    else{el.insertAdjacentHTML("beforeend",'<button id="nx">Next</button>');$("nx").onclick=go}
+   });
+  };
+  S.onHide=next;next();
  };
- S.onHide=next;next();
+ run();
 }
