@@ -52,6 +52,19 @@
             }),
         );
       }
+      const qback = '<a class="btn alt" href="#quiz">Quiz</a>';
+      function qmenu() {
+        m.innerHTML =
+          back +
+          '<h1>Quiz</h1><a class="btn" href="#quiz/grammar">Grammar</a><a class="btn" href="#quiz/vocab">Vocab</a>';
+      }
+      function gqz() {
+        m.innerHTML = qback + '<h1>Grammar quiz</h1><div id="q"></div>';
+        quiz(
+          $("q"),
+          G.flatMap((g) => g.q),
+        );
+      }
       function qz() {
         const p = all(),
           items = p.map(([j, r, e]) => ({
@@ -68,8 +81,8 @@
             ],
           }));
         m.innerHTML =
-          back +
-          '<h1>Quiz</h1><div class="card">Tap a word to see its reading. Double-tap a word you know to remove it for good.</div><div id="q"></div>';
+          qback +
+          '<h1>Vocab quiz</h1><div class="card">Tap a word to see its reading. Double-tap a word you know to remove it for good.</div><div id="q"></div>';
         quiz($("q"), items);
       }
       function stories() {
@@ -151,7 +164,9 @@
               "",
             );
         else if (h === "#vocab") vocab();
-        else if (h === "#quiz") qz();
+        else if (h === "#quiz") qmenu();
+        else if (h === "#quiz/vocab") qz();
+        else if (h === "#quiz/grammar") gqz();
         else if (h === "#stories") stories();
         else if (h === "#add") add();
         else if (h.startsWith("#story/")) story(+h.slice(7));
