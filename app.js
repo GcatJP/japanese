@@ -11,14 +11,18 @@ export const save=(f,v)=>setDoc(ref,{[f]:v},{merge:true});
 export const hide=id=>{if(!S.hidden.includes(id)){S.hidden.push(id);save("hidden",S.hidden)}};
 export const unhide=id=>{S.hidden=S.hidden.filter(x=>x!==id);return save("hidden",S.hidden)};
 export function start(ready){
- document.body.insertAdjacentHTML("beforeend",'<div id="login" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;padding:24px"><button id="lg">Sign in with Google</button></div>');
- $("lg").onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>alert(e.message));
  onAuthStateChanged(auth,async u=>{
-  if(!u)return;
+  if(!u){
+   if(!$("login")){
+    document.body.insertAdjacentHTML("beforeend",'<div id="login" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;padding:24px"><button id="lg">Sign in with Google</button></div>');
+    $("lg").onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>alert(e.message));
+   }
+   return;
+  }
   ref=doc(db,"users",u.uid);
   const s=await getDoc(ref);
   if(s.exists()){S.hidden=s.data().hidden||[];S.mine=s.data().mine||[]}
-  $("login").remove();ready();
+  $("login")?.remove();ready();
  });
 }
 let last=0,lastEl;
