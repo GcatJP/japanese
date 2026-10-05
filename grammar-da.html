@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>だ</title><link rel="stylesheet" href="style.css"></head><body><main>
+<a class="btn alt" href="index.html#grammar">Grammar list</a>
+<h1>だ <small>to be</small></h1>
+<div class="card">だ joins two things: <b>A は B だ</b> means "A is B". It is the plain, casual form. The polite form is です. Tap a word to see its reading.</div>
+<div class="card jp" id="ex"></div>
+<div class="card"><table>
+<tr><td></td><td>plain</td><td>polite</td></tr>
+<tr><td>is</td><td>だ</td><td>です</td></tr>
+<tr><td>is not</td><td>じゃない</td><td>じゃありません</td></tr>
+<tr><td>was</td><td>だった</td><td>でした</td></tr>
+<tr><td>was not</td><td>じゃなかった</td><td>じゃありませんでした</td></tr>
+</table></div>
+<div class="card">だ follows <b>nouns</b> (学生だ) and <b>な-adjectives</b> (元気だ, 静かだ). It does not follow <b>い-adjectives</b>: 高い stands alone, never 高いだ. Before ね and よ it sounds natural: だね, だよ.</div>
+<h1>Quiz</h1><div id="q"></div>
+<script type="module">
+import{$,start,quiz,w}from"./app.js";
+const s=(en,a,b)=>`<small>${en}</small><br>${a}＿${b}`;
+const wa=w("私","わたし"),gk=w("学生","がくせい"),ky=w("今日","きょう"),am=w("雨","あめ"),kn=w("昨日","きのう"),ys=w("休み","やすみ"),in_=w("犬","いぬ");
+const items=[
+{q:s("I am a student. (plain)",`${wa}は${gk}`,"。"),a:"だ",c:["だ","です","じゃない","だった"]},
+{q:s("It's rainy today. (polite)",`${ky}は${am}`,"。"),a:"です",c:["です","だ","だった","じゃない"]},
+{q:s("Yesterday was a day off. (plain)",`${kn}は${ys}`,"。"),a:"だった",c:["だった","だ","でした","じゃない"]},
+{q:s("This is not a dog. (plain)",`これは${in_}`,"。"),a:"じゃない",c:["じゃない","だ","だった","です"]},
+{q:"<small>Which one is wrong?</small>",a:"高いだ",c:["高いだ","元気だ","先生だ","静かだ"]},
+{q:s("Yesterday was a day off. (polite)",`${kn}は${ys}`,"。"),a:"でした",c:["でした","です","だった","じゃない"]}
+];
+$("ex").innerHTML=`${wa}は${gk}だ。<br><small style="font:16px sans-serif">I am a student.</small>`;
+start(()=>quiz($("q"),items,true));
+</script></main></body></html>
