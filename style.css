@@ -11,7 +11,8 @@ button,.btn{display:block;width:100%;padding:14px;margin:8px 0;border:0;border-r
 .alt{background:var(--card);color:var(--fg)}
 .jp{font:32px/1.8 "Hiragino Sans",sans-serif;text-align:center}
 .top{font-size:14px;opacity:.7}
-input{width:100%;padding:12px;margin:6px 0;font:inherit;border-radius:10px;border:1px solid #8886;background:var(--bg);color:var(--fg);-webkit-user-select:text;user-select:text}
+textarea{height:200px}
+input,textarea{width:100%; padding:12px;margin:6px 0;font:inherit;border-radius:10px;border:1px solid #8886;background:var(--bg);color:var(--fg);-webkit-user-select:text;user-select:text}
 ruby rt{visibility:hidden;font-size:.5em}ruby.show rt{visibility:visible}
 button.ok{background:var(--ok)!important;color:#fff!important}button.no{background:var(--no)!important;color:#fff!important}
 table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px solid #8883}
