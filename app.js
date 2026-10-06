@@ -25,12 +25,17 @@ if(s.exists()){S.hidden=s.data().hidden||[];S.mine=s.data().mine||[];S.stories=s
   $("login")?.remove();ready();
  });
 }
-let last=0,lastEl;
+let tm,lp=0;
+document.addEventListener("touchstart",e=>{
+ lp=0;
+ const r=e.target.closest("ruby.w[data-id]");if(!r)return;
+ tm=setTimeout(()=>{lp=1;hide(r.dataset.id);S.onHide()},600);
+},{passive:true});
+["touchend","touchmove","touchcancel"].forEach(t=>document.addEventListener(t,()=>clearTimeout(tm)));
 document.addEventListener("click",e=>{
  const r=e.target.closest("ruby.w");if(!r)return;
- const t=Date.now();
- if(r===lastEl&&t-last<400&&r.dataset.id){lastEl=null;hide(r.dataset.id);S.onHide();return}
- lastEl=r;last=t;r.classList.toggle("show");
+ if(lp){lp=0;return}
+ r.classList.toggle("show");
 });
 export function quiz(el,items,seq){
  const run=()=>{

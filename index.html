@@ -80,9 +80,7 @@
                 .map((x) => x[2]),
             ],
           }));
-        m.innerHTML =
-          qback +
-          '<h1>Vocab quiz</h1><div class="card">Tap a word to see its reading. Double-tap a word you know to remove it for good.</div><div id="q"></div>';
+        m.innerHTML = qback + '<h1>Vocab quiz</h1><div id="q"></div>';
         quiz($("q"), items);
       }
       function stories() {
